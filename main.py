@@ -1,11 +1,40 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from collections import deque
-import random
+import numpy as np
 
 
 class UkraineRoads:
-    CITIES = {
+    CITIES = [
+        "Київ",
+        "Луцьк",
+        "Рівне",
+        "Житомир",
+        "Чернігів",
+        "Суми",
+        "Львів",
+        "Тернопіль",
+        "Хмельницький",
+        "Вінниця",
+        "Івано-Франківськ",
+        "Ужгород",
+        "Чернівці",
+        "Черкаси",
+        "Полтава",
+        "Харків",
+        "Кропивницький",
+        "Дніпро",
+        "Запоріжжя",
+        "Донецьк",
+        "Луганськ",
+        "Одеса",
+        "Миколаїв",
+        "Херсон",
+        "Сімферополь",
+        "Севастополь",
+    ]
+
+    POSITIONS = {
         "Київ": (6.5, 7.5),
         "Луцьк": (2, 8),
         "Рівне": (3, 8),
@@ -34,7 +63,7 @@ class UkraineRoads:
         "Севастополь": (9, 0.5),
     }
 
-    ROADS = {
+    NEIGHBORS = {
         "Київ": [
             "Житомир",
             "Одеса",
@@ -108,14 +137,20 @@ class UkraineRoads:
 
     def __init__(self, print_info=True, show=False):
         self.g = nx.Graph()
-        self.g.add_nodes_from(UkraineRoads.CITIES.keys())
-        nx.set_node_attributes(self.g, UkraineRoads.CITIES, "pos")
-        for city, roads in UkraineRoads.ROADS.items():
-            self.g.add_edges_from([(city, t) for t in roads])
+        self.g.add_nodes_from(UkraineRoads.CITIES)
+        nx.set_node_attributes(self.g, UkraineRoads.POSITIONS, "pos")
+        for city, neighbors in UkraineRoads.NEIGHBORS.items():
+            roads = [(city, n, {"weight":self.get_distance(city, n)}) for n in neighbors]
+            self.g.add_edges_from(roads)
         if print_info:
             self.print_info()
         if show:
             self.show()
+
+    def get_distance(self, a, b):
+        a_pos = UkraineRoads.POSITIONS[a]
+        b_pos = UkraineRoads.POSITIONS[b]
+        return int(np.sqrt((a_pos[0]-b_pos[0])**2 + (a_pos[1]-b_pos[1])**2)*100)
 
     def show(self):
         plt.figure(figsize=(12, 6))
@@ -128,6 +163,8 @@ class UkraineRoads:
             node_color="lightblue",
             font_size=8,
         )
+        labels = nx.get_edge_attributes(self.g, 'weight')
+        nx.draw_networkx_edge_labels(self.g, pos, edge_labels=labels, font_size=7)
         plt.title("Ukraine")
         plt.show()
 
@@ -164,9 +201,24 @@ class UkraineRoads:
                 queue.extend(set(self.g[vertex]) - visited)
         return visit_order
 
+    def dijkstra(self, start):
+        distances = {vertex: float('infinity') for vertex in self.g}
+        distances[start] = 0
+        unvisited = list(self.g.keys())
+
+        while unvisited:
+            current_vertex = min(unvisited, key=lambda vertex: distances[vertex])
+            if distances[current_vertex] == float('infinity'):
+                break
+            for neighbor, weight in self.g[current_vertex].items():
+                distance = distances[current_vertex] + weight
+                if distance < distances[neighbor]:
+                    distances[neighbor] = distance
+            unvisited.remove(current_vertex)
+        return distances
+
+
 if __name__ == "__main__":
-    U = UkraineRoads()
+    U = UkraineRoads(show=True)
     print(f"DFS visit order: {", ".join(U.dfs("Київ"))}")
     print(f"BFS visit order: {", ".join(U.bfs("Київ"))}")
-
-
