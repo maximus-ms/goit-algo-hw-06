@@ -142,41 +142,26 @@ class UkraineRoads:
     def dfs(self, start):
         visited = set()
         visit_order = []
-        # Використовуємо стек для зберігання вершин
         stack = [start]
         while stack:
-            # Вилучаємо вершину зі стеку
             vertex = stack.pop()
             if vertex not in visited:
-                # print(vertex, end=' ')
                 visit_order.append(vertex)
-                # Відвідуємо вершину
                 visited.add(vertex)
-                # Додаємо сусідні вершини до стеку
                 stack.extend(list(self.g[vertex]))
         return visit_order
 
     def bfs(self, start):
-        # Ініціалізація порожньої множини для зберігання відвіданих вершин
         visited = set()
         visit_order = []
-        # Ініціалізація черги з початковою вершиною
         queue = deque([start])
 
-        while queue:  # Поки черга не порожня, продовжуємо обхід
-            # Вилучаємо першу вершину з черги
+        while queue:
             vertex = queue.popleft()
-            # Перевіряємо, чи була вершина відвідана раніше
             if vertex not in visited:
-                # Якщо не була відвідана, друкуємо її
-                # print(vertex, end=" ")
                 visit_order.append(vertex)
-                # Додаємо вершину до множини відвіданих вершин
                 visited.add(vertex)
-                # Додаємо всіх невідвіданих сусідів вершини до кінця черги
-                # Операція різниці множин вилучає вже відвідані вершини зі списку сусідів
                 queue.extend(set(self.g[vertex]) - visited)
-        # Повертаємо множину відвіданих вершин після завершення обходу
         return visit_order
 
 if __name__ == "__main__":
