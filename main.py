@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from collections import deque
 import numpy as np
 
+import pandas as pd
 
 class UkraineRoads:
     CITIES = [
@@ -135,13 +136,15 @@ class UkraineRoads:
         "Севастополь": ["Сімферополь"],
     }
 
-    def __init__(self, print_info=True, show=False):
+    def __init__(self, print_info=False, show=False):
         self.g = nx.Graph()
         self.g.add_nodes_from(UkraineRoads.CITIES)
         nx.set_node_attributes(self.g, UkraineRoads.POSITIONS, "pos")
         for city, neighbors in UkraineRoads.NEIGHBORS.items():
-            roads = [(city, n, {"weight":self.get_distance(city, n)}) for n in neighbors]
-            self.g.add_edges_from(roads)
+            for neighbor in neighbors:
+                distance = self.get_distance(city, neighbor)
+                self.g.add_edge(city, neighbor, weight=distance)
+            # roads = [(city, n, {"weight":self.get_distance(city, n)}) for n in neighbors]
         if print_info:
             self.print_info()
         if show:
@@ -204,21 +207,26 @@ class UkraineRoads:
     def dijkstra(self, start):
         distances = {vertex: float('infinity') for vertex in self.g}
         distances[start] = 0
-        unvisited = list(self.g.keys())
+        unvisited = list(self.g)
 
         while unvisited:
             current_vertex = min(unvisited, key=lambda vertex: distances[vertex])
             if distances[current_vertex] == float('infinity'):
                 break
-            for neighbor, weight in self.g[current_vertex].items():
-                distance = distances[current_vertex] + weight
+            for neighbor, attr in self.g[current_vertex].items():
+                distance = distances[current_vertex] + attr["weight"]
                 if distance < distances[neighbor]:
                     distances[neighbor] = distance
             unvisited.remove(current_vertex)
         return distances
 
+    def get_distance_map(self):
+        return pd.DataFrame( { c:self.dijkstra(c) for c in self.g } )
 
 if __name__ == "__main__":
-    U = UkraineRoads(show=True)
+    U = UkraineRoads()
+    U.print_info()
     print(f"DFS visit order: {", ".join(U.dfs("Київ"))}")
     print(f"BFS visit order: {", ".join(U.bfs("Київ"))}")
+    print(U.get_distance_map())
+    U.show()

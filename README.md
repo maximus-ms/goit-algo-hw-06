@@ -39,7 +39,7 @@ Centrality:
   Сімферополь      0.16
   Севастополь      0.04
 ```
-![Ukraine cities](./data/UkraineGraph.png)
+![Ukraine cities](data/UkraineGraph.png)
 
 ## Task2
 Write a program that utilizes the DFS and BFS algorithms to find paths in the graph created in the first task.
@@ -60,3 +60,11 @@ We have to remember each algorithm's pros and cons and decide which should be us
 
 ## Task3
 Implement Dijkstra's algorithm to find the shortest path in the developed graph: add weights to the edges of the graph and find the shortest path between all vertices of the graph.
+
+### Solution
+Method ```dijkstra(start)``` is implemented.\
+Distance between all cities gathered in a pandas data_frame (easier to print)
+![Ukraine cities](data/CitiesDistance.png)
+
+## Conclusions
+Graph is great tool to solve problems with nodes and connections between them. There are a number of different algorithm to use for different tasks like to search the shortest path between two nodes in the graph, measure the shortest distance, etc. The Python library ```NetworkX``` has great functionality for working with graphs, including but not limiter to their analysis and visualization.
